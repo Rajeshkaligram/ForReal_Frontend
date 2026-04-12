@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { DateRange } from "react-day-picker";
@@ -23,7 +23,7 @@ import Category from "@/components/product-details/Category";
 import ProductInfo from "@/components/product-details/ProductInfo";
 import RelatedProducts from "@/components/product-details/RelatedProducts";
 
-export default function ProductPage() {
+function ProductContent() {
   const params = useSearchParams();
   const productId = params.get("id");
 
@@ -315,5 +315,30 @@ export default function ProductPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function ProductPage() {
+  return (
+    <Suspense fallback={
+      <section className="py-12 md:py-16 min-h-screen bg-white">
+        <div className="container max-w-7xl mx-auto px-4 md:px-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-16">
+            <div className="space-y-4">
+              <div className="bg-gray-100 animate-pulse aspect-[4/5] w-full" />
+            </div>
+            <div className="space-y-5 pt-4">
+              <div className="bg-gray-100 animate-pulse h-3 w-24 rounded" />
+              <div className="bg-gray-100 animate-pulse h-8 w-3/4 rounded" />
+              <div className="bg-gray-100 animate-pulse h-4 w-1/3 rounded" />
+              <div className="bg-gray-100 animate-pulse h-32 w-full mt-10" />
+              <div className="bg-gray-100 animate-pulse h-12 w-full mt-10" />
+            </div>
+          </div>
+        </div>
+      </section>
+    }>
+      <ProductContent />
+    </Suspense>
   );
 }
