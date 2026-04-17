@@ -158,47 +158,82 @@ button:hover {
 }
 
 /* rdp calnder custom style */
-.rdp-nav {
-  justify-content: space-between !important;
-  width: 100% !important;
-}
-
-.rdp-nav button {
-  color: var(--primary) !important;
-  border: border 1px solid var(--border) !important;
-
-}
-
-.rdp-na .rdp-chevron {
-  color: var(--primary) !important;
-  border: border 1px solid var(--border) !important;
-}
-
-.rdp-months {
-
-  color: var(--muted) !important;
+.custom-calendar {
   font-size: 11px !important;
 }
 
-@media(min-width:1200px) {
-  .rdp-months {
-    flex-wrap: nowrap !important;
-  }
+/* @media(min-width:1024px){
+.custom-calendar  .rdp-months{
+  flex-wrap: nowrap !important;
+}
+} */
 
+.rdp-nav{
+  justify-content:  space-between !important;
+  width: 100% !important;
 }
 
-.rdp-weekdays {
-  color: var(--primary) !important;
+.custom-calendar .rdp-chevron {
+  width: 32px !important;
+  height: 32px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border: 1px solid rgba(20, 20, 20, 0.14) !important;
+  background-color: transparent !important;
+  cursor: pointer !important;
+  transition: 0.18s !important;
+  fill: black !important;
 }
 
-.rdp-caption_label {
-  color: var(--primary) !important;
+.custom-calendar .rdp-month_caption {
+  justify-content: center !important;
+}
+
+
+
+.custom-calendar .rdp-chevron svg {
+  width: 50% !important;
+  height: 50% !important;
+  display: block;
+}
+
+
+.custom-calendar .rdp-day {
+  font-size: 11px !important;
+  border-radius: 6px !important;
+  height: 33px !important;
+  width: 33px !important;
+}
+
+.custom-calendar .rdp-day_button {
+  height: 33px !important;
+  width: 33px !important;
+}
+
+.custom-calendar .rdp-day_selected {
+  background-color: black !important;
+  color: white !important;
+}
+
+.custom-calendar .rdp-day_disabled {
+  color: #d1d5db !important;
+  pointer-events: none !important;
+}
+
+.custom-calendar .rdp-day_today {
+  font-weight: 600 !important;
+}
+
+.custom-calendar .rdp-head_cell {
   font-size: 12px !important;
-  margin: auto !important;
+  color: #9ca3af !important;
 }
 
-.rdp-today {
-  color: black !important;
-  border: 1px solid black !important;
-  order: 1px solid #ddd !important;
+.custom-calendar .rdp-caption_label {
+  font-weight: 600 !important;
+  font-size: 12px !important;
+    font-weight: 600 !important;
+  color: rgb(20, 20, 20) !important;
+  margin: 0px !important;
 }

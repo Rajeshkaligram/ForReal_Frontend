@@ -28,7 +28,7 @@ export default function ProfilePage() {
   if (!isLoggedIn) return null;
 
   return (
-    <>
+  <>
       <ProfileHero />
       <ProfileDashboard />
     </>
