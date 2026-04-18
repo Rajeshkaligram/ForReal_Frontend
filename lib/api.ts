@@ -92,7 +92,7 @@ export const authAPI = {
   register: (payload: RegisterPayload) =>
     apiFetch<AuthResponse>("/signup", {
       method: "POST",
-      body: JSON.stringify(payload),
+      body: buildFormData(payload),
     }),
 
   login: (body: LoginPayload) =>
