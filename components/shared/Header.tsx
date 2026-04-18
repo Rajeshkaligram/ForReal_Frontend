@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import { Heart, Menu, X, ShoppingBag, User } from "lucide-react";
+import { Heart, Menu, X, ShoppingBag } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { transformImageUrl } from "@/lib/utils";
 
@@ -23,6 +23,12 @@ export default function Header() {
     setMobile(false);
   }, [pathname]);
 
+  // Initialize menu states based on current pathname
+  useEffect(() => {
+    setOpen(false);
+    setMobile(false);
+  }, []);
+
   // Close dropdown on outside click
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
@@ -34,15 +40,7 @@ export default function Header() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // 🔥 FIX: Reset dropdown when logout
-  useEffect(() => {
-    if (!isLoggedIn) {
-      setOpen(false);
-    }
-  }, [isLoggedIn]);
-
   const handleLogout = async () => {
-    setOpen(false); // ✅ important fix
     await logout();
     router.push("/");
   };
@@ -51,12 +49,11 @@ export default function Header() {
     ? `${user.first_name || ""} ${user.last_name || ""}`.trim()
     : "Account";
 
-  const avatarSrc =
-    transformImageUrl(user?.profile_image) || "/assets/images/profile.jpeg";
+  const avatarSrc = transformImageUrl(user?.profile_image) || "/assets/images/profile.jpeg";
 
   return (
-    <header className="w-full border-b border-border text-xs md:text-sm backdrop-blur-[14px] sticky top-0 z-50 bg-secondary/80">
-      <div className="mx-auto h-18 flex items-center justify-between px-4 md:px-10">
+    <header className="w-full border-b border-border text-xs md:text-sm backdrop-blur-[14px] sticky top-0 z-90 bg-secondary/80">
+      <div className="mx-auto h-18 flex items-center justify-between px-4! md:px-10!">
         {/* Mobile menu button */}
         <button className="md:hidden" onClick={() => setMobile(!mobile)}>
           {mobile ? <X size={22} /> : <Menu size={22} />}
@@ -86,22 +83,23 @@ export default function Header() {
         {/* Right side */}
         <div className="flex items-center gap-3 md:gap-4 relative" ref={dropdownRef}>
           {/* Wishlist */}
-          <Link href="/wishlist">
-            <Heart className="w-5 h-5 text-muted-foreground hover:text-primary" />
+          <Link href="/wishlist" aria-label="Wishlist">
+            <Heart className="w-5 h-5 text-muted-foreground hover:text-primary transition-colors" />
           </Link>
-
+          
           {/* Cart */}
-          <Link href="/cart">
-            <ShoppingBag className="w-5 h-5 text-muted-foreground hover:text-primary" />
+          <Link href="/cart" aria-label="Cart">
+            <ShoppingBag className="w-5 h-5 text-muted-foreground hover:text-primary transition-colors" />
           </Link>
 
           <div className="hidden md:block w-px h-6 bg-border" />
 
           {isLoading ? (
+            /* Skeleton while auth loads */
             <div className="w-8 h-8 rounded-full bg-border animate-pulse" />
           ) : isLoggedIn ? (
             <>
-              {/* Profile */}
+              {/* Profile trigger */}
               <div
                 className="flex items-center gap-2 cursor-pointer"
                 onClick={() => setOpen(!open)}
@@ -112,66 +110,73 @@ export default function Header() {
                   height={32}
                   alt={displayName}
                   className="rounded-full h-8 w-8 object-cover"
+                  onError={(e) => {
+                    (e.currentTarget as HTMLImageElement).src =
+                      "/assets/images/profile.jpeg";
+                  }}
                 />
                 <span className="hidden md:block text-sm font-medium text-muted">
                   {displayName}
                 </span>
               </div>
 
-              {/* Logged-in dropdown */}
-              {open && isLoggedIn && (
-                <div className="absolute right-0 top-12 w-52 bg-white border shadow-md z-50">
-                  <div className="p-4 border-b">
-                    <p className="text-xs text-muted">SIGNED IN AS</p>
+              {/* Dropdown */}
+              {open && (
+                <div className="absolute right-0 top-12 w-52 bg-white border border-border/10 shadow-md z-50">
+                  <div className="p-4 border-b border-border">
+                    <p className="text-xs tracking-wide text-muted">SIGNED IN AS</p>
                     <p className="font-medium">{displayName}</p>
-                    <p className="text-xs truncate">{user?.email}</p>
+                    <p className="text-xs text-muted truncate">{user?.email}</p>
                   </div>
 
-                  <Link href="/profile" className="block px-4 py-3 hover:bg-gray-50">
-                    View Profile
-                  </Link>
-                  <Link href="/wishlist" className="block px-4 py-3 hover:bg-gray-50">
-                    Wishlist
-                  </Link>
-                  <button
-                    onClick={handleLogout}
-                    className="w-full text-left px-4 py-3 hover:bg-gray-50"
-                  >
-                    Log Out
-                  </button>
+                  <div className="text-xs">
+                    <Link
+                      href="/profile"
+                      className="block px-4 py-3 hover:text-primary text-muted hover:bg-primary/4 border-b border-border"
+                    >
+                      View Profile
+                    </Link>
+                    <Link
+                      href="/message"
+                      className="block px-4 py-3 hover:text-primary text-muted hover:bg-primary/4 border-b border-border"
+                    >
+                      Messages
+                    </Link>
+                    <Link
+                      href="/wishlist"
+                      className="block px-4 py-3 hover:text-primary text-muted hover:bg-primary/4 border-b border-border"
+                    >
+                      Wishlist
+                    </Link>
+                    <Link
+                      href="/listing"
+                      className="block px-4 py-3 hover:text-primary text-muted hover:bg-primary/4 border-b border-border"
+                    >
+                      Add a Posting
+                    </Link>
+                    <button
+                      onClick={handleLogout}
+                      className="w-full text-left block px-4 py-3 hover:text-primary text-muted hover:bg-primary/4"
+                    >
+                      Log Out
+                    </button>
+                  </div>
                 </div>
               )}
             </>
           ) : (
-            <>
-              {/* 🔥 NOT LOGGED IN UI (like your screenshot) */}
-              <div
-                className="cursor-pointer"
-                onClick={() => setOpen(!open)}
+            /* Not logged in */
+            <div className="flex items-center gap-3">
+              <Link
+                href="/auth/login"
+                className="text-sm font-medium text-muted hover:text-primary transition-colors"
               >
-                <User className="w-5 h-5 text-muted-foreground" />
-              </div>
-
-              {open && !isLoggedIn && (
-                <div className="absolute right-0 top-12 w-48 bg-white shadow-lg z-50 text-[12.48px]">
-                  <p className="p-4  text-muted">
-                    Sign in to rent, save, and post pieces.
-                  </p>
-                  <Link
-                    href="/auth/login"
-                    className="block px-4 py-3 font-semibold hover:bg-gray-50 text-muted"
-                  >
-                    Sign in
-                  </Link>
-                  <Link
-                    href="/auth/register"
-                    className="block px-4 py-3 hover:bg-gray-50"
-                  >
-                    Create account
-                  </Link>
-                </div>
-              )}
-            </>
+                Sign In
+              </Link>
+              <Link href="/auth/register" className="btn-bg !py-2 !px-4 text-xs">
+                Join
+              </Link>
+            </div>
           )}
         </div>
       </div>
@@ -179,35 +184,49 @@ export default function Header() {
       {/* Mobile menu */}
       {mobile && (
         <div className="md:hidden border-t bg-background">
-          <Link href="/" className="block px-4 py-3 border-b">
+          <Link
+            href="/"
+            className="block px-4 py-3 border-b"
+            onClick={() => setMobile(false)}
+          >
             Home
           </Link>
-          <Link href="/discover" className="block px-4 py-3 border-b">
+          <Link
+            href="/discover"
+            className="block px-4 py-3 border-b"
+            onClick={() => setMobile(false)}
+          >
             Discover
           </Link>
-          <Link href="/works" className="block px-4 py-3 border-b">
+          <Link
+            href="/works"
+            className="block px-4 py-3 border-b"
+            onClick={() => setMobile(false)}
+          >
             How it Works
           </Link>
-
           {isLoggedIn ? (
             <>
-              <Link href="/profile" className="block px-4 py-3 border-b">
+              <Link href="/profile" className="block px-4 py-3 border-b" onClick={() => setMobile(false)}>
                 Profile
               </Link>
+              <Link href="/wishlist" className="block px-4 py-3 border-b" onClick={() => setMobile(false)}>
+                Wishlist
+              </Link>
               <button
-                onClick={handleLogout}
-                className="w-full text-left px-4 py-3"
+                onClick={() => { setMobile(false); handleLogout(); }}
+                className="w-full text-left block px-4 py-3 text-maroon"
               >
                 Log Out
               </button>
             </>
           ) : (
             <>
-              <Link href="/auth/login" className="block px-4 py-3 border-b">
+              <Link href="/auth/login" className="block px-4 py-3 border-b" onClick={() => setMobile(false)}>
                 Sign In
               </Link>
-              <Link href="/auth/register" className="block px-4 py-3">
-                Join
+              <Link href="/auth/register" className="block px-4 py-3" onClick={() => setMobile(false)}>
+                Join FoReal
               </Link>
             </>
           )}

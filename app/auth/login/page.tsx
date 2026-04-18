@@ -4,9 +4,6 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
-import { FcGoogle } from "react-icons/fc";
-import { FaApple } from "react-icons/fa";
-import { HiOutlineMail } from "react-icons/hi";
 import { useAuth } from "@/context/AuthContext";
 
 export default function LoginPage() {
@@ -22,16 +19,12 @@ export default function LoginPage() {
     e.preventDefault();
     setError("");
     setLoading(true);
-
     try {
       await login({ email: form.email, password: form.password });
       router.push("/profile");
     } catch (err: unknown) {
-      const msg =
-        err instanceof Error
-          ? err.message
-          : "Invalid email or password.";
-
+      const msg = err instanceof Error ? err.message : "Invalid email or password.";
+      // Backend sends this when account needs email verification
       if (
         msg.toLowerCase().includes("activation") ||
         msg.toLowerCase().includes("verify") ||
@@ -47,120 +40,106 @@ export default function LoginPage() {
   };
 
   return (
- <>
-    <div className=" flex items-center justify-center  px-4 pt-6 md:pt-12">
-      <div className="w-full max-w-md border border-gray-200 p-10 ">
-        
-        {/* Top Text */}
-        <p className="sec_tagline">
-          WELCOME BACK
-        </p>
+    <div className="min-h-screen flex">
+      {/* Left — decorative */}
+      <div
+        className="hidden lg:flex lg:w-1/2 bg-primary items-end p-16 bg-cover bg-center relative"
+        style={{ backgroundImage: "url('/assets/images/hero-back.png')" }}
+      >
+        <div className="absolute inset-0 bg-black/60" />
+        <div className="relative z-10 text-white">
+          <h2 className="montserrat text-5xl font-medium leading-tight mb-4">
+            Real,<br />for the<br />moment.
+          </h2>
+          <p className="text-secondary/60 text-sm">
+            Rent designer fashion. Look extraordinary.
+          </p>
+        </div>
+      </div>
 
-        <h1 className="text-lg md:text-[32px] font-serif mb-8 leading-snug">
-          Sign in to <br />
-          <span className="italic">your account.</span>
-        </h1>
+      {/* Right — form */}
+      <div className="w-full lg:w-1/2 flex items-center justify-center px-6 py-16 bg-secondary">
+        <div className="w-full max-w-md">
+          <Link href="/" className="text-2xl font-bold montserrat text-primary block mb-10">
+            FoReal
+          </Link>
 
-        {/* Error */}
-        {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3 mb-6">
-            {error}
-          </div>
-        )}
+          <h1 className="text-3xl font-medium mb-1">Welcome back</h1>
+          <p className="text-muted text-sm mb-8">Sign in to your account</p>
 
-        {/* Form */}
-        <form onSubmit={handleSubmit} className="space-y-6">
-          
-          {/* Email */}
-          <div>
-            <label className="text-[11px] tracking-[2px] text-gray-400 block mb-2">
-              EMAIL
-            </label>
-            <input
-              type="email"
-              required
-              value={form.email}
-              onChange={(e) =>
-                setForm({ ...form, email: e.target.value })
-              }
-              placeholder="you@example.com"
-              className="w-full border border-gray-300 px-4 py-3 text-sm outline-none focus:border-black"
-            />
-          </div>
-
-          {/* Password */}
-          <div>
-            <label className="text-[11px] tracking-[2px] text-gray-400 block mb-2">
-              PASSWORD
-            </label>
-
-            <div className="relative">
-              <input
-                type={showPass ? "text" : "password"}
-                required
-                value={form.password}
-                onChange={(e) =>
-                  setForm({ ...form, password: e.target.value })
-                }
-                placeholder="Your password"
-                className="w-full border border-gray-300 px-4 py-3 text-sm pr-12 outline-none focus:border-black"
-              />
-              <button
-                type="button"
-                onClick={() => setShowPass(!showPass)}
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500"
-              >
-                {showPass ? <EyeOff size={16} /> : <Eye size={16} />}
-              </button>
+          {error && (
+            <div className="bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3 mb-6 rounded">
+              {error}
             </div>
-          </div>
+          )}
 
-          {/* Button */}
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full hover:bg-black/85 text-white py-3 text-sm tracking-widest flex items-center justify-center gap-2 disabled:opacity-60"
-          >
-            {loading && (
-              <Loader2 size={14} className="animate-spin" />
-            )}
-            {loading ? "SIGNING IN..." : "SIGN IN"}
-          </button>
-        </form>
+          <form onSubmit={handleSubmit} className="space-y-5">
+            {/* Email */}
+            <div>
+              <label className="block text-xs font-medium tracking-widest uppercase text-muted mb-2">
+                Email
+              </label>
+              <input
+                type="email"
+                required
+                value={form.email}
+                onChange={(e) => setForm({ ...form, email: e.target.value })}
+                placeholder="you@example.com"
+                className="w-full border border-border bg-white px-4 py-3 text-sm outline-none focus:border-primary transition-colors"
+              />
+            </div>
 
-        {/* Divider */}
-        <div className="flex items-center my-6">
-          <div className="flex-1 h-px bg-gray-300" />
-          <span className="px-3 text-[10px] text-gray-400 tracking-widest">
-            OR CONTINUE WITH
-          </span>
-          <div className="flex-1 h-px bg-gray-300" />
+            {/* Password */}
+            <div>
+              <label className="block text-xs font-medium tracking-widest uppercase text-muted mb-2">
+                Password
+              </label>
+              <div className="relative">
+                <input
+                  type={showPass ? "text" : "password"}
+                  required
+                  value={form.password}
+                  onChange={(e) => setForm({ ...form, password: e.target.value })}
+                  placeholder="••••••••"
+                  className="w-full border border-border bg-white px-4 py-3 text-sm pr-12 outline-none focus:border-primary transition-colors"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPass(!showPass)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-muted"
+                >
+                  {showPass ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
+              </div>
+            </div>
+
+            <div className="flex justify-end">
+              <Link
+                href="/auth/forgot-password"
+                className="text-xs text-muted hover:text-primary transition-colors"
+              >
+                Forgot password?
+              </Link>
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="btn-bg w-full flex items-center justify-center gap-2 disabled:opacity-60"
+            >
+              {loading && <Loader2 size={15} className="animate-spin" />}
+              {loading ? "Signing in..." : "Sign In"}
+            </button>
+          </form>
+
+          <p className="mt-8 text-center text-sm text-muted">
+            Don&apos;t have an account?{" "}
+            <Link href="/auth/register" className="text-primary font-medium hover:underline">
+              Join FoReal
+            </Link>
+          </p>
         </div>
-
-        {/* Social Login */}
-        <div className="grid grid-cols-3 gap-3">
-          <button className="border  border-muted/30 hover:border-primary py-3 px-6 flex items-center justify-center hover:bg-muted/10 transition">
-            <FcGoogle size={20} />
-          </button>
-
-          <button className="border  border-muted/30 hover:border-primary py-3 px-6 flex items-center justify-center hover:bg-muted/10 transition">
-            <FaApple size={20} />
-          </button>
-
-          <button className="border  border-muted/30 hover:border-primary py-3 px-6 flex items-center justify-center hover:bg-muted/10 transition">
-            <HiOutlineMail size={20} />
-          </button>
-        </div>
-
-
       </div>
     </div>
-    
-        <p className="text-center text-[12.48px] text-gray-500 py-8">
-          Don&apos;t have an account?{" "}
-          <Link href="/auth/register" className="text-black underline">
-            Create one
-          </Link>
-        </p></>
   );
 }
